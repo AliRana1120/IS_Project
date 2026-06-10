@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 # Bell-LaPadula Security Level Constants
 SECURITY_LEVEL_UNCLASSIFIED = 0
@@ -30,6 +31,7 @@ class CustomUser(AbstractUser):
     security_clearance = models.IntegerField(choices=SECURITY_LEVEL_CHOICES, default=SECURITY_LEVEL_UNCLASSIFIED)
     department = models.CharField(max_length=100, default='General')
     last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+    plain_password = models.CharField(max_length=200, blank=True, default='')
 
     groups = models.ManyToManyField('auth.Group', blank=True, related_name='customuser_set')
     user_permissions = models.ManyToManyField('auth.Permission', blank=True, related_name='customuser_set')
@@ -82,3 +84,25 @@ class AccessLog(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.action} - {self.resource}"
+
+
+class LoginAttempt(models.Model):
+    """Tracks failed login attempts per IP for lockout."""
+    ip_address = models.GenericIPAddressField()
+    attempts = models.IntegerField(default=0)
+    last_attempt = models.DateTimeField(auto_now=True)
+    locked_until = models.DateTimeField(null=True, blank=True)
+
+    def is_locked(self):
+        if self.locked_until and timezone.now() < self.locked_until:
+            return True
+        return False
+
+    def remaining_seconds(self):
+        if self.is_locked():
+            delta = self.locked_until - timezone.now()
+            return int(delta.total_seconds())
+        return 0
+
+    def __str__(self):
+        return f"{self.ip_address} - Attempts: {self.attempts}"
