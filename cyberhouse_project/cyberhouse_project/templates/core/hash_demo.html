@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+{% block title %}Hash Demo{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1>🔑 Password Hashing Demonstration</h1>
+      <p>Live proof of bcrypt password hashing with salt rounds and SHA-256 comparison</p>
+    </div>
+  </div>
+
+  <div class="card mb-2" style="margin-bottom:1.5rem;">
+    <div class="card-title" style="margin-bottom:1rem;">📚 Why bcrypt?</div>
+    <div class="grid-3">
+      <div style="background:var(--bg-dark); border-radius:8px; padding:1rem; border:1px solid var(--border);">
+        <div style="color:var(--accent-cyan); font-weight:700; margin-bottom:0.4rem;">🧂 Automatic Salting</div>
+        <div class="text-muted" style="font-size:0.85rem;">bcrypt generates a unique random salt per password, making rainbow table attacks impossible — even identical passwords produce different hashes.</div>
+      </div>
+      <div style="background:var(--bg-dark); border-radius:8px; padding:1rem; border:1px solid var(--border);">
+        <div style="color:var(--accent-green); font-weight:700; margin-bottom:0.4rem;">⚙️ Work Factor</div>
+        <div class="text-muted" style="font-size:0.85rem;">12 rounds of processing makes each hash computation expensive. As hardware improves, rounds can be increased without changing stored hashes.</div>
+      </div>
+      <div style="background:var(--bg-dark); border-radius:8px; padding:1rem; border:1px solid var(--border);">
+        <div style="color:var(--accent-purple); font-weight:700; margin-bottom:0.4rem;">🛡️ Brute Force Resistant</div>
+        <div class="text-muted" style="font-size:0.85rem;">At 12 rounds, bcrypt takes ~250ms per hash — a billion attempts would take years, making offline brute-force attacks infeasible.</div>
+      </div>
+    </div>
+  </div>
+
+  {% for item in demo_data %}
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-header">
+      <div class="card-title">🔐 Password: <span style="color:var(--accent-yellow);">{{ item.password }}</span></div>
+      {% if item.verified %}<span class="badge-success">✅ Verification Passed</span>{% endif %}
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="hash-block">
+          <div class="hash-label">bcrypt Hash (12 rounds)</div>
+          <div class="hash-value">{{ item.bcrypt_hash }}</div>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); padding:0.5rem;">
+          Prefix <span style="color:var(--accent-cyan);">$2b$12$</span> = bcrypt version 2b, 12 rounds of salting
+        </div>
+      </div>
+      <div>
+        <div class="hash-block">
+          <div class="hash-label">SHA-256 (for comparison — no salt)</div>
+          <div class="hash-value" style="color:var(--accent-yellow);">{{ item.sha256 }}</div>
+        </div>
+        <div style="font-size:0.75rem; color:var(--accent-red); padding:0.5rem;">
+          ⚠️ SHA-256 alone is fast and unsalted — vulnerable to rainbow tables
+        </div>
+      </div>
+    </div>
+    <div class="terminal mt-2">
+      <div class="comment"># Verification process</div>
+      <div><span class="prompt">bcrypt.checkpw(</span><span class="output">"{{ item.password }}"</span><span class="prompt">.encode(), stored_hash)</span></div>
+      <div><span class="prompt">→ </span><span class="output">{% if item.verified %}True ✓ — Password matches stored bcrypt hash{% endif %}</span></div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:1rem;">💻 Implementation — Django Settings</div>
+    <div class="terminal">
+      <div class="comment"># settings.py — PASSWORD_HASHERS</div>
+      <div><span class="prompt">PASSWORD_HASHERS = [</span></div>
+      <div style="padding-left:1.5rem;"><span class="output">'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',</span></div>
+      <div style="padding-left:1.5rem; color:var(--text-muted);">'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # fallback</div>
+      <div><span class="prompt">]</span></div>
+      <br>
+      <div class="comment"># All user.set_password() calls use bcrypt automatically</div>
+      <div class="comment"># bcrypt.gensalt(rounds=12) generates cryptographic random salt</div>
+      <div class="comment"># No plaintext passwords stored anywhere in the database</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

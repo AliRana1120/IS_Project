@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Create Document{% endblock %}
+{% block content %}
+<div class="page-wrapper" style="max-width:700px; margin:0 auto;">
+  <a href="{% url 'documents' %}" style="color:var(--text-muted); text-decoration:none; font-size:0.875rem;">← Back to Documents</a>
+  <div class="card mt-2">
+    <div class="card-header">
+      <div class="card-title">📝 Create Classified Document</div>
+    </div>
+    <div class="alert alert-info">
+      🔒 <strong>Bell-LaPadula Star Property (No Write Down):</strong> You can only create documents at or above your clearance level ({{ user.get_security_label }}). Writing to a lower classification would allow data leakage.
+    </div>
+    <form method="post" style="margin-top:1rem;">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Document Title</label>
+        {{ form.title }}
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Security Classification</label>
+          {{ form.security_level }}
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
+            Your clearance: <strong>{{ user.get_security_label }}</strong> (Level {{ user.security_clearance }})
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          {{ form.category }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Document Content</label>
+        {{ form.content }}
+      </div>
+      <div style="display:flex; gap:1rem; margin-top:1rem;">
+        <button type="submit" class="btn-primary">💾 Save Document</button>
+        <a href="{% url 'documents' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

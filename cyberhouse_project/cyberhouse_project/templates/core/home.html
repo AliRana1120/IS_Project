@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-tag">🔐 Information Security Lab Project</div>
+  <h1>Welcome to <span class="gradient-text">CyberHouse</span></h1>
+  <p>A secure operations center implementing Bell-LaPadula Mandatory Access Control, Role-Based Access Control (RBAC), and bcrypt password hashing — all in one Django application.</p>
+  <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+    <a href="{% url 'register' %}" class="btn-primary">🚀 Get Started</a>
+    <a href="{% url 'login' %}" class="btn-secondary">🔑 Login</a>
+  </div>
+</section>
+
+<div class="features-grid">
+  <div class="feature-card">
+    <div class="feature-icon icon-cyan">🔒</div>
+    <h3>Bell-LaPadula Model</h3>
+    <p>Mandatory Access Control enforcing <strong>No Read Up</strong> and <strong>No Write Down</strong> policies across three security levels: Unclassified, Confidential, and Secret.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon icon-purple">👥</div>
+    <h3>Role-Based Access Control</h3>
+    <p>Three distinct roles — <strong>Admin</strong>, <strong>Analyst</strong>, and <strong>Viewer</strong> — each with unique permissions and security clearances enforced at every endpoint.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon icon-green">🔑</div>
+    <h3>bcrypt Password Hashing</h3>
+    <p>All passwords are hashed using <strong>bcrypt with 12 rounds</strong> of salt, making brute-force attacks computationally infeasible. No plaintext passwords stored anywhere.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon icon-yellow">📋</div>
+    <h3>Audit Access Logs</h3>
+    <p>Every access attempt — granted or denied — is logged with timestamp, IP address, user identity, and reason. Full accountability chain for forensic analysis.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon icon-red">⚡</div>
+    <h3>Real-Time Policy Demo</h3>
+    <p>Interactive demonstration showing exactly which documents each user can read or write, with live BLP policy decisions explained for every object.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon icon-cyan">🛡️</div>
+    <h3>CSRF & Session Security</h3>
+    <p>Django's built-in CSRF protection, secure session management, and middleware-enforced security policies guard every page and form submission.</p>
+  </div>
+</div>
+
+<!-- Security Levels Explainer -->
+<div class="container" style="padding-bottom: 3rem;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🔐 Bell-LaPadula Security Levels & Role Mapping</div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Security Clearance</th>
+            <th>Can Read</th>
+            <th>Can Write</th>
+            <th>RBAC Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge-role badge-admin">Admin</span></td>
+            <td><span class="badge-secret">Secret (Level 2)</span></td>
+            <td>Unclassified, Confidential, Secret</td>
+            <td>Secret only (No Write Down)</td>
+            <td>Full access — users, docs, logs, admin panel</td>
+          </tr>
+          <tr>
+            <td><span class="badge-role badge-analyst">Analyst</span></td>
+            <td><span class="badge-confidential">Confidential (Level 1)</span></td>
+            <td>Unclassified, Confidential</td>
+            <td>Confidential and above (No Write Down)</td>
+            <td>Create/view documents, view logs</td>
+          </tr>
+          <tr>
+            <td><span class="badge-role badge-viewer">Viewer</span></td>
+            <td><span class="badge-unclassified">Unclassified (Level 0)</span></td>
+            <td>Unclassified only</td>
+            <td>Cannot create documents</td>
+            <td>Read-only unclassified documents</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

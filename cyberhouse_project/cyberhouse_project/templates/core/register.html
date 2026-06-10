@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="form-wrapper" style="max-width:580px">
+  <div class="form-card">
+    <div class="form-header">
+      <div class="form-icon">👤</div>
+      <h2>Create Account</h2>
+      <p>Join CyberHouse — your role determines your security clearance</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="grid-2">
+        <div class="form-group">
+          <label>First Name</label>
+          {{ form.first_name }}
+          {{ form.first_name.errors }}
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          {{ form.last_name }}
+          {{ form.last_name.errors }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        {{ form.username }}
+        {{ form.username.errors }}
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        {{ form.department }}
+      </div>
+      <div class="form-group">
+        <label>Role (determines security clearance)</label>
+        {{ form.role }}
+        {{ form.role.errors }}
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">
+          Admin→Secret clearance | Analyst→Confidential | Viewer→Unclassified
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+      <button type="submit" class="btn-primary form-submit">🚀 Create Account</button>
+    </form>
+
+    <div class="form-footer">
+      Already registered? <a href="{% url 'login' %}">Login here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

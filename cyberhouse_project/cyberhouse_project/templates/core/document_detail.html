@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ doc.title }}{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <a href="{% url 'documents' %}" style="color:var(--text-muted); text-decoration:none; font-size:0.875rem;">← Back to Documents</a>
+
+  <div class="card mt-2">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem;">
+      <div>
+        <div style="margin-bottom:0.5rem;">
+          {% if doc.security_level == 2 %}<span class="badge-secret">🔴 SECRET</span>
+          {% elif doc.security_level == 1 %}<span class="badge-confidential">🔵 CONFIDENTIAL</span>
+          {% else %}<span class="badge-unclassified">🟢 UNCLASSIFIED</span>{% endif %}
+        </div>
+        <h1 style="font-size:1.75rem; font-weight:800;">{{ doc.title }}</h1>
+        <p class="text-muted" style="margin-top:0.4rem;">
+          📂 {{ doc.category }} | 👤 Created by {{ doc.created_by.username }} | 🕐 {{ doc.created_at|date:"F d, Y H:i" }}
+        </p>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-dark); border:1px solid var(--border); border-radius:8px; padding:1.5rem; line-height:1.8; color:var(--text-primary);">
+      {{ doc.content }}
+    </div>
+  </div>
+
+  <div class="card mt-2">
+    <div class="card-title" style="margin-bottom:1rem;">🔐 Bell-LaPadula Access Verification</div>
+    <div class="terminal">
+      <div class="comment"># BLP Simple Security Property (No Read Up) — Check passed ✓</div>
+      <div><span class="prompt">user_clearance = </span><span class="output">{{ user.security_clearance }} ({{ user.get_security_label }})</span></div>
+      <div><span class="prompt">document_level = </span><span class="output">{{ doc.security_level }} ({{ doc.get_security_label }})</span></div>
+      <div><span class="prompt">can_read = </span><span class="output">user_clearance >= document_level → {{ user.security_clearance }} >= {{ doc.security_level }} → True ✓</span></div>
+      <div><span class="prompt">access_granted = </span><span class="output">True — Logged to AccessLog</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

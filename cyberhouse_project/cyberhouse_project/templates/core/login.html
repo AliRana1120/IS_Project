@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="form-wrapper">
+  <div class="form-card">
+    <div class="form-header">
+      <div class="form-icon">🔑</div>
+      <h2>Secure Login</h2>
+      <p>Access the CyberHouse Operations Center</p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-error">❌ {{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Username</label>
+        {{ form.username }}
+        {{ form.username.errors }}
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        {{ form.password }}
+        {{ form.password.errors }}
+      </div>
+      <button type="submit" class="btn-primary form-submit">🔐 Authenticate</button>
+    </form>
+
+    <div class="form-footer">
+      No account? <a href="{% url 'register' %}">Register here</a>
+    </div>
+
+    <div class="terminal mt-3">
+      <div class="comment"># Authentication process</div>
+      <div class="prompt">$ </div><span class="output">bcrypt.checkpw(password.encode(), stored_hash)</span><br>
+      <div class="prompt">$ </div><span class="output">Session bound → JWT-like Django session token</span><br>
+      <div class="prompt">$ </div><span class="output">AccessLog.objects.create(action='LOGIN'...)</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

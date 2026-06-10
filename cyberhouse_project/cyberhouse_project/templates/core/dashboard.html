@@ -1,0 +1,119 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1>📊 Operations Dashboard</h1>
+      <p>Welcome back, <strong>{{ user.username }}</strong> — 
+         Role: <span class="badge-role badge-{{ user.role }}">{{ user.role }}</span> | 
+         Clearance: 
+         {% if user.security_clearance == 2 %}<span class="badge-secret">SECRET</span>
+         {% elif user.security_clearance == 1 %}<span class="badge-confidential">CONFIDENTIAL</span>
+         {% else %}<span class="badge-unclassified">UNCLASSIFIED</span>{% endif %}
+      </p>
+    </div>
+    {% if user.role != 'viewer' %}
+    <a href="{% url 'create_document' %}" class="btn-primary">+ New Document</a>
+    {% endif %}
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon icon-cyan">📁</div>
+      <div>
+        <div class="stat-number text-cyan">{{ stats.total_docs }}</div>
+        <div class="stat-label">Accessible Documents</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-red">🔴</div>
+      <div>
+        <div class="stat-number text-red">{{ stats.secret_docs }}</div>
+        <div class="stat-label">Secret Documents</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-cyan">🔵</div>
+      <div>
+        <div class="stat-number text-cyan">{{ stats.confidential_docs }}</div>
+        <div class="stat-label">Confidential Documents</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-green">🟢</div>
+      <div>
+        <div class="stat-number text-green">{{ stats.unclassified_docs }}</div>
+        <div class="stat-label">Unclassified Documents</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Recent Docs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📂 Recent Documents</div>
+        <a href="{% url 'documents' %}" style="font-size:0.8rem; color:var(--accent-cyan); text-decoration:none;">View All →</a>
+      </div>
+      {% if docs %}
+        {% for doc in docs %}
+        <a href="{% url 'document_detail' doc.pk %}" class="doc-card mb-2" style="margin-bottom:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            {% if doc.security_level == 2 %}<span class="badge-secret">SECRET</span>
+            {% elif doc.security_level == 1 %}<span class="badge-confidential">CONFIDENTIAL</span>
+            {% else %}<span class="badge-unclassified">UNCLASSIFIED</span>{% endif %}
+            <span class="text-muted" style="font-size:0.75rem;">{{ doc.created_at|date:"M d" }}</span>
+          </div>
+          <div class="doc-card-title">{{ doc.title }}</div>
+          <div class="doc-card-preview">{{ doc.content|truncatechars:80 }}</div>
+        </a>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted text-center" style="padding:2rem;">No accessible documents yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Recent Activity</div>
+        <a href="{% url 'access_logs' %}" style="font-size:0.8rem; color:var(--accent-cyan); text-decoration:none;">Full Logs →</a>
+      </div>
+      {% if recent_logs %}
+        {% for log in recent_logs %}
+        <div style="display:flex; gap:0.75rem; padding:0.65rem 0; border-bottom:1px solid var(--border); align-items:flex-start;">
+          <div style="font-size:1.1rem; margin-top:0.1rem;">
+            {% if log.success %}✅{% else %}🚫{% endif %}
+          </div>
+          <div>
+            <div style="font-size:0.85rem; font-weight:600;">{{ log.action }}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">{{ log.resource }} — {{ log.timestamp|date:"M d, H:i" }}</div>
+            {% if log.details %}<div style="font-size:0.72rem; color:var(--text-muted);">{{ log.details|truncatechars:60 }}</div>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted text-center" style="padding:2rem;">No activity yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Security Info -->
+  <div class="card mt-3">
+    <div class="card-header">
+      <div class="card-title">🔐 Your Bell-LaPadula Clearance</div>
+      <a href="{% url 'security_demo' %}" class="btn-secondary btn-sm">View BLP Demo →</a>
+    </div>
+    <div class="terminal">
+      <div class="comment"># Bell-LaPadula Policy for {{ user.username }}</div>
+      <div><span class="prompt">user.role = </span><span class="output">"{{ user.role }}"</span></div>
+      <div><span class="prompt">user.security_clearance = </span><span class="output">{{ user.security_clearance }} ({{ user.get_security_label }})</span></div>
+      <div><span class="prompt">can_read_up_to = </span><span class="output">Level {{ user.security_clearance }} (No Read Up enforced)</span></div>
+      <div><span class="prompt">can_write_down_to = </span><span class="output">Level {{ user.security_clearance }} (No Write Down enforced)</span></div>
+      <div><span class="prompt">last_login_ip = </span><span class="output">{{ user.last_login_ip|default:"N/A" }}</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

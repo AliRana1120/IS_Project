@@ -1,0 +1,93 @@
+{% extends 'core/base.html' %}
+{% block title %}Bell-LaPadula Demo{% endblock %}
+{% block content %}
+<div class="page-wrapper">
+  <div class="page-header">
+    <div>
+      <h1>🔐 Bell-LaPadula Policy Demo</h1>
+      <p>Live proof of No Read Up (NRU) and No Write Down (NWD) enforcement for your account</p>
+    </div>
+  </div>
+
+  <!-- Theory Box -->
+  <div class="card mb-2" style="margin-bottom:1.5rem;">
+    <div class="card-title" style="margin-bottom:1rem;">📚 Bell-LaPadula Model — Formal Definition</div>
+    <div class="grid-2">
+      <div style="background:var(--bg-dark); border:1px solid rgba(0,212,255,0.2); border-radius:8px; padding:1.25rem;">
+        <div style="color:var(--accent-cyan); font-weight:700; margin-bottom:0.5rem;">ss-property (No Read Up)</div>
+        <div style="font-family:'Courier New',monospace; font-size:0.8rem; color:var(--accent-green); margin-bottom:0.5rem;">
+          subject S can read object O iff<br>
+          clearance(S) ≥ classification(O)
+        </div>
+        <div class="text-muted" style="font-size:0.8rem;">Prevents subjects from reading objects at higher security levels — stops upward information flow.</div>
+      </div>
+      <div style="background:var(--bg-dark); border:1px solid rgba(255,71,87,0.2); border-radius:8px; padding:1.25rem;">
+        <div style="color:var(--accent-red); font-weight:700; margin-bottom:0.5rem;">*-property (No Write Down)</div>
+        <div style="font-family:'Courier New',monospace; font-size:0.8rem; color:var(--accent-green); margin-bottom:0.5rem;">
+          subject S can write object O iff<br>
+          clearance(S) ≤ classification(O)
+        </div>
+        <div class="text-muted" style="font-size:0.8rem;">Prevents subjects from writing to lower-level objects — stops downward information leakage.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Your Info -->
+  <div class="alert alert-info" style="margin-bottom:1.5rem;">
+    👤 <strong>{{ user.username }}</strong> — Role: {{ user.role }} | Security Clearance: <strong>Level {{ user.security_clearance }} ({{ user.get_security_label }})</strong>
+  </div>
+
+  <!-- BLP Matrix -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📊 Live Access Matrix — All Documents</div>
+    </div>
+    <div class="blp-matrix">
+      <div class="blp-row header">
+        <span>Document</span>
+        <span>Classification</span>
+        <span>Read (NRU)</span>
+        <span>Write (NWD)</span>
+        <span>BLP Decision</span>
+      </div>
+      {% for r in demo_results %}
+      <div class="blp-row">
+        <span style="font-weight:600;">{{ r.doc.title }}</span>
+        <span>
+          {% if r.doc.security_level == 2 %}<span class="badge-secret">SECRET</span>
+          {% elif r.doc.security_level == 1 %}<span class="badge-confidential">CONFIDENTIAL</span>
+          {% else %}<span class="badge-unclassified">UNCLASSIFIED</span>{% endif %}
+        </span>
+        <span>
+          {% if r.can_read %}<span class="badge-success">✅ ALLOWED</span>{% else %}<span class="badge-fail">🚫 DENIED</span>{% endif %}
+        </span>
+        <span>
+          {% if r.can_write %}<span class="badge-success">✅ ALLOWED</span>{% else %}<span class="badge-fail">🚫 DENIED</span>{% endif %}
+        </span>
+        <div style="font-family:'Courier New',monospace; font-size:0.7rem; color:var(--text-muted);">
+          <div>R: {{ r.read_reason }}</div>
+          <div>W: {{ r.write_reason }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="padding:2rem; text-align:center; color:var(--text-muted);">No documents in the system yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Implementation Code -->
+  <div class="card mt-3">
+    <div class="card-title" style="margin-bottom:1rem;">💻 Implementation — security.py</div>
+    <div class="terminal">
+      <div class="comment"># Bell-LaPadula enforcement in Python (Django)</div><br>
+      <div><span class="prompt">def </span><span class="output">bell_lapadula_can_read(user, document):</span></div>
+      <div style="padding-left:1.5rem; color:var(--text-muted)">"""Simple Security Property: No Read Up"""</div>
+      <div style="padding-left:1.5rem;"><span class="prompt">return </span><span class="output">user.security_clearance >= document.security_level</span></div>
+      <br>
+      <div><span class="prompt">def </span><span class="output">bell_lapadula_can_write(user, target_level):</span></div>
+      <div style="padding-left:1.5rem; color:var(--text-muted)">"""Star Property: No Write Down"""</div>
+      <div style="padding-left:1.5rem;"><span class="prompt">return </span><span class="output">user.security_clearance <= target_level</span></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
